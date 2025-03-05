@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from fastapi import UploadFile, File
 from typing import List, Optional
         
@@ -44,6 +44,6 @@ class ExtractCriteriaResponse(BaseModel):
         message (str): A message describing the result of the operation
         error (Optional[str]): An optional error message if something went wrong
     """
-    data: Criteria
+    data: Criteria | dict = Field(default_factory=dict)
     message: str
     error: Optional[str] = None

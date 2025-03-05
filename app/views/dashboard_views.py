@@ -1,6 +1,6 @@
 import asyncio
 from typing import List, Tuple, Dict, Any
-from fastapi import UploadFile, status
+from fastapi import UploadFile, status, HTTPException
 
 from core.text_extractor import TextExtractor
 from core.criteria_extractor import CriteriaExtractor
@@ -51,13 +51,9 @@ class DashboardViews:
             }
         except Exception as e:
             # Return error response if any exception occurs
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, {
-                "data": {},
-                "message": "Error extracting criteria",
-                "error": str(e)
-            }
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
-    async def score_resumes(self, criteria: dict, files: List[UploadFile]) -> str:
+    async def score_resumes(self, criteria: dict, files: List[UploadFile]) -> Tuple[int, str]:
         """
         Score and rank multiple resumes against specified job criteria.
         
@@ -66,7 +62,9 @@ class DashboardViews:
             files (List[UploadFile]): List of resume documents to evaluate
             
         Returns:
-            str: Path to the generated CSV file containing resume rankings
+            Tuple[int, str]: A tuple containing:
+                - HTTP status code
+                - Path to the generated CSV file containing resume rankings
             
         Raises:
             Exception: If any error occurs during processing, returns error response tuple
@@ -88,8 +86,4 @@ class DashboardViews:
             return csv_path
         except Exception as e:
             # Return error response if any exception occurs
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, { 
-                "data": {},
-                "message": "Error scoring resumes",
-                "error": str(e)
-            }
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

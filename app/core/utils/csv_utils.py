@@ -45,12 +45,18 @@ class CSVUtils:
         for candidate in data:
             for score_item in candidate.get('scores', []):
                 all_criteria.add(score_item['criteria'])
-        
+                
         all_criteria = sorted(list(all_criteria))
         
         # Write data to CSV
         with open(csv_filename, 'w', newline='') as csvfile:
-            fieldnames = ['Candidate Name'] + all_criteria + ['Total Score']
+            # Convert criteria to title case for the header
+            title_case_criteria = [criteria.replace('_', ' ').title() for criteria in all_criteria]
+            fieldnames = ['Candidate Name'] + title_case_criteria + ['Total Score']
+            
+            # Create a mapping from original criteria to title case criteria
+            criteria_mapping = {orig: title for orig, title in zip(all_criteria, title_case_criteria)}
+            
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             
             writer.writeheader()
@@ -59,18 +65,23 @@ class CSVUtils:
                 row = {'Candidate Name': candidate.get('candidate_name', 'Unknown')}
                 
                 # Initialize scores for all criteria to 0
-                for criteria in all_criteria:
-                    row[criteria] = 0
+                for criteria, title_criteria in criteria_mapping.items():
+                    row[title_criteria] = 0
                 
                 # Fill in the actual scores
                 total_score = 0
+                max_possible_score = 0
                 for score_item in candidate.get('scores', []):
                     criteria = score_item['criteria']
+                    title_criteria = criteria_mapping[criteria]
                     score = score_item['score']
-                    row[criteria] = score
+                    row[title_criteria] = score
                     total_score += score
+                    # Assuming each criteria has a maximum score of 5
+                    max_possible_score += 5
                 
-                row['Total Score'] = total_score
+                # Format total score as score/total
+                row['Total Score'] = f"{total_score}/{max_possible_score}"
                 writer.writerow(row)
         
         return csv_filename
