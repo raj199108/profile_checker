@@ -96,11 +96,9 @@ pytest tests/test_specific_file.py
 
 ## Demo Video
 
-```
 
 https://www.loom.com/share/a6d510fb37924d86aa44fc6d44301d24?sid=2e7d7b97-3646-44f2-af16-d3b454df1089
   
-```
 
 A demonstration video showcasing the application's features and usage will be added here.
 
